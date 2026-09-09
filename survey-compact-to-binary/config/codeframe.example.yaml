@@ -1,0 +1,67 @@
+# Example codeframe for a fictional snack-brand tracking survey.
+#
+# This describes the SYNTHETIC dataset produced by
+# scripts/generate_synthetic_data.py. Nothing here refers to any real
+# survey, client, or brand — every name is invented.
+#
+# Copy this file and edit it to describe your own survey. The conversion
+# logic reads only this codeframe; no survey specifics are hard-coded.
+
+# How generated indicator columns are named. {qid} and {code} are filled in.
+output_template: "{qid}_{code}"
+
+questions:
+  # ----- Single-response questions (passed through unchanged) ---------------
+  - id: Q1
+    label: "Age group"
+    type: single
+    column: Q1
+    codes:
+      1: "18-24"
+      2: "25-34"
+      3: "35-44"
+      4: "45-54"
+      5: "55+"
+
+  - id: Q2
+    label: "Region"
+    type: single
+    column: Q2
+    codes:
+      1: "North"
+      2: "South"
+      3: "East"
+      4: "West"
+
+  # ----- Multi-response, stored as one column per mention -------------------
+  - id: Q3
+    label: "Which snack brands have you bought in the last 3 months?"
+    type: multi
+    storage: multi_column
+    columns: [Q3_m1, Q3_m2, Q3_m3, Q3_m4, Q3_m5, Q3_m6]
+    codes:
+      1: "Crispa"
+      2: "Muncho"
+      3: "Snaxi"
+      4: "Krunch"
+      5: "Nibblz"
+      6: "Poppa"
+      7: "Zesti"
+      8: "Grainly"
+
+  # ----- Multi-response, stored as one delimited column ---------------------
+  - id: Q4
+    label: "Which snack brands are you aware of?"
+    type: multi
+    storage: delimited
+    column: Q4
+    delimiter: ";"
+    codes:
+      1: "Crispa"
+      2: "Muncho"
+      3: "Snaxi"
+      4: "Krunch"
+      5: "Nibblz"
+      6: "Poppa"
+      7: "Zesti"
+      8: "Grainly"

@@ -1,0 +1,32 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# --- Jupyter (never commit notebooks with outputs) ---
+.ipynb_checkpoints/
+
+# --- Generated data: bulk outputs are NOT committed ---
+# A tiny hand-checked sample lives under examples/sample_data/ instead.
+data/*.csv
+!data/.gitkeep
+
+# --- Secrets / environment (must never be committed) ---
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+
+# --- OS noise ---
+.DS_Store
+Thumbs.db

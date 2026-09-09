@@ -1,0 +1,28 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Run tests
+        run: pytest -q
+      - name: Smoke-test the pipeline on synthetic data
+        run: |
+          python scripts/generate_synthetic_data.py --rows 200 --seed 1 --out data/tmp.csv
+          compact2binary convert -i data/tmp.csv -c config/codeframe.example.yaml -o data/tmp_binary.csv --validate
