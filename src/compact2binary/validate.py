@@ -24,6 +24,7 @@ import pandas as pd
 
 from .codeframe import Codeframe, Question
 from .convert import parse_selected_codes
+from .util import format_indicator
 
 
 @dataclass
@@ -90,7 +91,8 @@ def _validate_question(
     template: str,
     report: ValidationReport,
 ) -> None:
-    out_cols = {code: template.format(qid=q.qid, code=code) for code in q.codes}
+    out_cols = {code: format_indicator(template, q.qid, code, q.codes[code])
+                for code in q.codes}
     known = set(q.codes)
 
     # All expected indicator columns must exist.
@@ -114,6 +116,8 @@ def _validate_question(
     unknown_counter: dict[int, int] = {}
     unparseable_total = 0
     mismatch_rows = 0
+    exclusive_violations = 0
+    exclusive_set = set(q.exclusive)
 
     indicator_frame = converted[list(out_cols.values())]
     for pos, (_, row) in enumerate(original.iterrows()):
@@ -125,6 +129,13 @@ def _validate_question(
                 unknown_counter[c] = unknown_counter.get(c, 0) + 1
 
         known_selected = {c for c in codes if c in known}
+
+        # Exclusive-code integrity: an exclusive code (e.g. "None of these")
+        # must not appear alongside any other selected code.
+        if exclusive_set:
+            picked_excl = known_selected & exclusive_set
+            if picked_excl and len(known_selected) > 1:
+                exclusive_violations += 1
 
         ind_row = indicator_frame.iloc[pos]
         if ind_row.isna().any():
@@ -149,4 +160,10 @@ def _validate_question(
         report._fail(
             f"{q.qid}: {mismatch_rows} row(s) where indicator count != "
             f"distinct known codes selected"
+        )
+    if exclusive_violations:
+        excl_labels = ", ".join(q.codes[c] for c in q.exclusive)
+        report._fail(
+            f"{q.qid}: {exclusive_violations} row(s) select an exclusive code "
+            f"({excl_labels}) alongside other codes"
         )

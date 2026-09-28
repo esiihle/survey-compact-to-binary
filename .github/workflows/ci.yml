@@ -25,4 +25,5 @@ jobs:
       - name: Smoke-test the pipeline on synthetic data
         run: |
           python scripts/generate_synthetic_data.py --rows 200 --seed 1 --out data/tmp.csv
-          compact2binary convert -i data/tmp.csv -c config/codeframe.example.yaml -o data/tmp_binary.csv --validate
+          compact2binary convert -i data/tmp.csv -c config/codeframe.example.yaml -o data/tmp.parquet --labels --validate
+          compact2binary stats -i data/tmp.parquet -c config/codeframe.example.yaml --weight weight --labels

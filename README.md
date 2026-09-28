@@ -39,7 +39,13 @@ it produces binary output like this:
 - **Passthrough-safe.** IDs, weights, single-response questions, and open-ends are carried through in their original order, untouched.
 - **Built-in QC.** An independent validator re-reads the input and checks the output for unknown codes, unparseable tokens, round-trip count mismatches, and non-binary values — returning a structured report and a non-zero exit code for CI.
 - **Correct missing-data handling.** Choose per question whether a blank answer means "selected nothing" (`0`) or "not asked / off-base" (`NaN`).
+- **Value-labelled columns.** Name indicators `Q3_krunch` instead of `Q3_4` with `--labels` (or a `{label}` template) for self-documenting output.
+- **Exclusive-code integrity check.** Declare a "None of these" code as exclusive; the validator flags any respondent who picks it *and* a real option.
+- **Penetration stats.** A `stats` command emits per-code frequencies and percentages, weighted when you supply a weight column.
+- **CSV, TSV & Parquet.** Read and write any of them; the format is chosen from the file extension.
 - **Runnable out of the box.** A synthetic data generator means you can clone and run the whole pipeline in under a minute.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full 0.1.0 → 0.2.0 history.
 
 ## Quickstart
 
@@ -62,11 +68,23 @@ compact2binary convert \
 Expected tail:
 
 ```
-Wrote 500 rows x 20 cols -> data/synthetic_binary.csv
+Wrote 500 rows x 21 cols -> data/synthetic_binary.csv
 Validation: PASS
   respondents: 500
   multi_questions: 2
-  indicator_columns: 16
+  indicator_columns: 17
+```
+
+More of the CLI:
+
+```bash
+# Human-readable labelled columns, written to Parquet, with inline QC
+compact2binary convert -i data/synthetic_compact.csv \
+    -c config/codeframe.example.yaml -o data/binary.parquet --labels --validate
+
+# Weighted per-code penetration table
+compact2binary stats -i data/binary.parquet \
+    -c config/codeframe.example.yaml --weight weight --labels
 ```
 
 Prefer the Python API?
@@ -122,6 +140,7 @@ The validator is deliberately **independent** of the converter — it re-parses 
 | Check | Meaning |
 |-------|---------|
 | Unknown codes | A code appears in the data but not the codeframe (stale codeframe / upstream recode bug). **Error.** |
+| Exclusive-code co-occurrence | A code marked `exclusive` (e.g. "None of these") appears alongside other codes. **Error.** |
 | Unparseable tokens | A cell isn't an integer code (e.g. `"x"`, `"2.5"`). **Warning**, token ignored. |
 | Round-trip mismatch | Indicators set ≠ distinct known codes selected, per respondent. **Error.** |
 | Domain violation | An indicator isn't `0`, `1`, or a deliberate `NaN`. **Error.** |
@@ -139,7 +158,11 @@ compact2binary convert -i data/dirty.csv -c config/codeframe.example.yaml \
 ```
 survey-compact-to-binary/
 ├── src/compact2binary/
-│   ├── codeframe.py     # Codeframe model + YAML loader
+│   ├── codeframe.py     # Codeframe model + YAML loader (incl. exclusive codes)
+│   ├── util.py          # slugify + indicator-name formatting
+│   ├── stats.py         # penetration / frequency statistics
+│   ├── tables.py        # CSV / TSV / Parquet I/O dispatch
+│   ├── logging_setup.py # --verbose / --quiet logging
 │   ├── convert.py       # compact -> binary conversion
 │   ├── validate.py      # independent QC / audit
 │   └── cli.py           # command-line interface

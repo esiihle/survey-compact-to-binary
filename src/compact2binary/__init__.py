@@ -13,9 +13,12 @@ from __future__ import annotations
 
 from .codeframe import Codeframe, CodeframeError, Question, load_codeframe
 from .convert import convert, indicator_columns, parse_selected_codes
+from .stats import format_penetration, penetration
+from .tables import read_table, write_table
+from .util import format_indicator, slugify
 from .validate import ValidationReport, validate
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "Codeframe",
@@ -27,5 +30,11 @@ __all__ = [
     "parse_selected_codes",
     "ValidationReport",
     "validate",
+    "penetration",
+    "format_penetration",
+    "read_table",
+    "write_table",
+    "format_indicator",
+    "slugify",
     "__version__",
 ]

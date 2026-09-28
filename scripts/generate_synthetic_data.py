@@ -37,6 +37,8 @@ except ImportError:  # pragma: no cover - faker is a declared dependency
     )
 
 BRAND_CODES = list(range(1, 9))  # 8 fictional brands, codes 1..8
+NONE_CODE = 9                     # Q3 "None of these" (exclusive)
+NONE_PROB = 0.07                  # share of respondents who bought no brand
 MAX_MENTIONS = 6                  # Q3 has six mention slots
 AGE_CODES = [1, 2, 3, 4, 5]
 REGION_CODES = [1, 2, 3, 4]
@@ -76,8 +78,15 @@ def build_rows(n: int, seed: int, dirty: bool) -> list[dict[str, str]]:
 
     rows: list[dict[str, str]] = []
     for i in range(1, n + 1):
-        purchased = _weighted_brand_sample(rng)
-        aware = _awareness_from_purchase(purchased, rng)
+        # A minority bought nothing -> they pick "None of these" (code 9) only,
+        # which is a valid exclusive answer (not a data error).
+        if rng.random() < NONE_PROB:
+            purchased = [NONE_CODE]
+        else:
+            purchased = _weighted_brand_sample(rng)
+        aware = _awareness_from_purchase(
+            [c for c in purchased if c != NONE_CODE], rng
+        )
 
         row: dict[str, str] = {
             "respondent_id": f"R{i:05d}",
@@ -103,6 +112,9 @@ def build_rows(n: int, seed: int, dirty: bool) -> list[dict[str, str]]:
         rows[0]["Q3_m1"] = "99"
         # 2) A non-integer token the validator should count as unparseable.
         rows[1]["Q4"] = rows[1]["Q4"] + ";x"
+        # 3) An exclusive-code violation: "None of these" (9) AND a real brand.
+        rows[2]["Q3_m1"] = str(NONE_CODE)
+        rows[2]["Q3_m2"] = "1"
 
     return rows
 

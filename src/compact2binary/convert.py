@@ -25,6 +25,7 @@ from .codeframe import (
     Codeframe,
     Question,
 )
+from .util import format_indicator
 
 
 def _clean_token(value: object) -> str | None:
@@ -97,7 +98,8 @@ def parse_selected_codes(
 
 def _expand_multi(df: pd.DataFrame, question: Question, template: str) -> pd.DataFrame:
     """Build the 0/1 indicator frame for one multi question."""
-    out_cols = {code: template.format(qid=question.qid, code=code)
+    out_cols = {code: format_indicator(template, question.qid, code,
+                                       question.codes[code])
                 for code in question.codes}
 
     # Pre-allocate as object so we can place NaN for off-base respondents.

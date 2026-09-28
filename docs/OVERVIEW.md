@@ -50,9 +50,16 @@ This repo was produced by **reimplementing the technique against synthetic data*
 
 The included pre-commit hooks (`gitleaks` for secret scanning, `nbstripout` to reject notebooks with outputs) enforce that discipline on every commit.
 
+## Shipped since 0.1.0
+
+See [CHANGELOG.md](../CHANGELOG.md) for detail. In brief, 0.2.0 added
+value-labelled output columns, an exclusive-code ("None of these") integrity
+check, weighted penetration statistics (`stats`), Parquet/TSV I/O, and logging.
+These moved from the wishlist below into the tool proper.
+
 ## Possible extensions
 
-- Direct readers/writers for SPSS (`.sav`) and Parquet alongside CSV.
+- Direct readers/writers for SPSS (`.sav`).
 - A `binary -> compact` inverse transform for round-tripping.
 - Automatic codeframe scaffolding from a data dictionary export.
-- Value-labelled output (categorical dtype) for questions where labels, not codes, are wanted downstream.
+- Categorical-dtype output for questions where labels, not codes, are wanted as values downstream.

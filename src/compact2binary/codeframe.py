@@ -25,6 +25,8 @@ from typing import Any
 
 import yaml
 
+from .util import format_indicator
+
 # Storage layouts we know how to parse for multi-response questions.
 MULTI_COLUMN = "multi_column"
 DELIMITED = "delimited"
@@ -54,6 +56,9 @@ class Question:
         column: For ``delimited`` or ``single`` storage, the single source column.
         delimiter: For ``delimited`` storage, the separator between codes.
         missing_policy: How to fill indicators when the compact answer is blank.
+        exclusive: Codes that must not co-occur with any other code on the same
+            respondent (e.g. a "None of these" / "Don't know" option). The
+            validator flags respondents who break this.
     """
 
     qid: str
@@ -65,6 +70,7 @@ class Question:
     column: str | None = None
     delimiter: str = ";"
     missing_policy: str = MISSING_ZERO
+    exclusive: list[int] = field(default_factory=list)
 
     @property
     def is_multi(self) -> bool:
@@ -81,7 +87,8 @@ class Question:
 
     def output_columns(self, template: str) -> list[str]:
         """Names of the binary indicator columns this question produces."""
-        return [template.format(qid=self.qid, code=code) for code in self.codes]
+        return [format_indicator(template, self.qid, code, self.codes[code])
+                for code in self.codes]
 
 
 @dataclass
@@ -154,6 +161,23 @@ def _parse_question(raw: dict[str, Any], index: int) -> Question:
         raise CodeframeError(
             f"{ctx}: storage must be one of {sorted(_VALID_MULTI_STORAGE)}"
         )
+
+    # Optional exclusive codes (e.g. "None of these"): must be real codes.
+    raw_excl = raw.get("exclusive", []) or []
+    if not isinstance(raw_excl, list):
+        raise CodeframeError(f"{ctx}: 'exclusive' must be a list of codes")
+    exclusive: list[int] = []
+    for c in raw_excl:
+        try:
+            code = int(c)
+        except (TypeError, ValueError):
+            raise CodeframeError(f"{ctx}: exclusive code '{c}' is not an integer")
+        if code not in codes:
+            raise CodeframeError(
+                f"{ctx}: exclusive code {code} is not in this question's codes"
+            )
+        exclusive.append(code)
+
     if storage == MULTI_COLUMN:
         cols = _require(raw, "columns", ctx)
         if not isinstance(cols, list) or not cols:
@@ -161,6 +185,7 @@ def _parse_question(raw: dict[str, Any], index: int) -> Question:
         return Question(
             qid=qid, label=label, qtype=qtype, codes=codes, storage=storage,
             columns=[str(c) for c in cols], missing_policy=missing_policy,
+            exclusive=exclusive,
         )
     # delimited
     column = str(_require(raw, "column", ctx))
@@ -168,6 +193,7 @@ def _parse_question(raw: dict[str, Any], index: int) -> Question:
     return Question(
         qid=qid, label=label, qtype=qtype, codes=codes, storage=storage,
         column=column, delimiter=delimiter, missing_policy=missing_policy,
+        exclusive=exclusive,
     )
 
 
