@@ -52,14 +52,16 @@ The included pre-commit hooks (`gitleaks` for secret scanning, `nbstripout` to r
 
 ## Shipped since 0.1.0
 
-See [CHANGELOG.md](../CHANGELOG.md) for detail. In brief, 0.2.0 added
+See [CHANGELOG.md](../CHANGELOG.md) for detail. In brief: 0.2.0 added
 value-labelled output columns, an exclusive-code ("None of these") integrity
 check, weighted penetration statistics (`stats`), Parquet/TSV I/O, and logging.
-These moved from the wishlist below into the tool proper.
+0.3.0 added net/combination variables, a `decode` inverse transform
+(binary → compact), and Excel (`.xlsx`) I/O. These moved from the wishlist
+below into the tool proper.
 
 ## Possible extensions
 
 - Direct readers/writers for SPSS (`.sav`).
-- A `binary -> compact` inverse transform for round-tripping.
 - Automatic codeframe scaffolding from a data dictionary export.
 - Categorical-dtype output for questions where labels, not codes, are wanted as values downstream.
+- Cross-question consistency rules (e.g. "bought ⇒ aware") in the validator.

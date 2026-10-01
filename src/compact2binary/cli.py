@@ -5,9 +5,10 @@ Subcommands:
 * ``convert``  - compact -> binary, optional inline QC (``--validate``)
 * ``validate`` - QC an existing conversion against its codeframe
 * ``stats``    - per-code penetration/frequency table (weighted if asked)
+* ``decode``   - inverse transform: binary matrix back to compact form
 
-Input and output may be CSV, TSV, or Parquet; the format is chosen from the
-file extension. Examples::
+Input and output may be CSV, TSV, Parquet, or Excel (.xlsx); the format is
+chosen from the file extension. Examples::
 
     # Convert, with human-readable labelled columns and inline QC
     compact2binary convert -i data/compact.csv -c config/codeframe.example.yaml \
@@ -16,6 +17,10 @@ file extension. Examples::
     # Penetration table, weighted, written to CSV
     compact2binary stats -i data/binary.csv -c config/codeframe.example.yaml \
         --weight weight -o data/penetration.csv
+
+    # Round-trip: rebuild compact data from the binary matrix
+    compact2binary decode -i data/binary.csv -c config/codeframe.example.yaml \
+        -o data/compact_again.csv
 """
 
 from __future__ import annotations
@@ -25,6 +30,7 @@ import sys
 
 from .codeframe import load_codeframe
 from .convert import convert
+from .decode import decode
 from .logging_setup import configure_logging
 from .stats import format_penetration, penetration
 from .tables import read_table, write_table
@@ -83,6 +89,15 @@ def _cmd_stats(args: argparse.Namespace, log) -> int:
     return 0
 
 
+def _cmd_decode(args: argparse.Namespace, log) -> int:
+    codeframe = _apply_label_template(load_codeframe(args.codeframe), args.labels)
+    binary = read_table(args.input, as_str=False)
+    compact = decode(binary, codeframe)
+    write_table(compact, args.output)
+    log.info(f"Wrote {len(compact)} rows x {compact.shape[1]} cols -> {args.output}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="compact2binary",
@@ -128,6 +143,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_stat.add_argument("--labels", action="store_true",
                         help="expect label-based indicator names (see convert)")
     p_stat.set_defaults(func=_cmd_stats)
+
+    # decode ------------------------------------------------------------------
+    p_dec = sub.add_parser("decode", help="inverse: binary matrix back to compact")
+    _common_flags(p_dec)
+    p_dec.add_argument("-i", "--input", required=True, help="binary matrix")
+    p_dec.add_argument("-c", "--codeframe", required=True, help="codeframe YAML")
+    p_dec.add_argument("-o", "--output", required=True,
+                       help="compact output (.csv/.tsv/.parquet/.xlsx)")
+    p_dec.add_argument("--labels", action="store_true",
+                       help="expect label-based indicator names (see convert)")
+    p_dec.set_defaults(func=_cmd_decode)
 
     return parser
 

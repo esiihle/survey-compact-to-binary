@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0]
+
+### Added
+- **Net / combination variables.** A multi-response question can define `nets`
+  in the codeframe — named OR-combinations of its codes emitted as extra 0/1
+  columns (e.g. `Q3_net_any_premium`). Nets inherit the question's missing-data
+  policy.
+- **`decode` — inverse transform.** A new `decode` subcommand and `decode()`
+  API rebuild compact (delimited) storage from a binary matrix, making the
+  pipeline round-trippable.
+- **Excel (`.xlsx`) I/O.** `read_table` / `write_table` now handle `.xlsx` and
+  `.xlsm` alongside CSV/TSV/Parquet, chosen by file extension. Requires the
+  `excel` extra (`pip install '.[excel]'`).
+
 ## [0.2.0]
 
 ### Added

@@ -26,6 +26,7 @@ from .codeframe import (
     Question,
 )
 from .util import format_indicator
+from .nets import compute_nets
 
 
 def _clean_token(value: object) -> str | None:
@@ -162,6 +163,11 @@ def convert(
         pieces.append(_expand_multi(df, q, template))
 
     converted = pd.concat(pieces, axis=1)
+
+    # Append any net/combination columns defined in the codeframe.
+    nets = compute_nets(converted, codeframe)
+    if not nets.empty:
+        converted = pd.concat([converted, nets], axis=1)
     return converted
 
 

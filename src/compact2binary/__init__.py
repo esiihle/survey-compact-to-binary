@@ -11,18 +11,21 @@ Public API::
 
 from __future__ import annotations
 
-from .codeframe import Codeframe, CodeframeError, Question, load_codeframe
+from .codeframe import Codeframe, CodeframeError, Net, Question, load_codeframe
 from .convert import convert, indicator_columns, parse_selected_codes
+from .decode import decode
+from .nets import compute_nets, net_columns, net_name
 from .stats import format_penetration, penetration
 from .tables import read_table, write_table
 from .util import format_indicator, slugify
 from .validate import ValidationReport, validate
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "Codeframe",
     "CodeframeError",
+    "Net",
     "Question",
     "load_codeframe",
     "convert",
@@ -32,6 +35,10 @@ __all__ = [
     "validate",
     "penetration",
     "format_penetration",
+    "compute_nets",
+    "net_columns",
+    "net_name",
+    "decode",
     "read_table",
     "write_table",
     "format_indicator",

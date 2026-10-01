@@ -1,113 +1,107 @@
-# Publishing v0.2.0 with a real commit history
+# Publishing compact2binary v0.3.0 with a real commit history
 
-This repo ships with a helper, `build_history_v2.sh`, that turns the v0.2.0
-changes into **six coherent feature commits on top of your v0.1.0 commit** —
-each one a real, self-contained change that builds and passes its tests. That
-is what reads as genuine engineering: an initial release, then a series of
-improvements, each doing one thing.
+This ships four new feature commits on top of your existing v0.2.0 history —
+each a real, self-contained change that builds and passes its tests. Unlike the
+v0.2.0 push, **this is a normal push, not a force-push**: your repo is already
+at the correct root-level structure, so we're just adding commits on top.
 
-> **On honesty (read this):** every commit will be dated *now*. That is
-> completely normal for a portfolio project built over a weekend — nobody
-> blinks at a repo whose commits share a day or two. What you must **not** do
-> is backdate commits (e.g. with `GIT_COMMITTER_DATE`) to fake a multi-week
-> timeline. A cluster of commits pretending to span months is trivially
-> detectable and is the actual red flag. If you want the history to genuinely
-> grow over time, keep shipping the roadmap items for real over the coming
-> weeks and commit as you go.
+> **On honesty:** the new commits will be dated *now*. That's fine — an early
+> project moving 0.1 → 0.2 → 0.3 over a short span is completely normal. Don't
+> backdate to fake a longer timeline.
+
+You need `survey-compact-to-binary-v0.3.0.zip` (this zip). Cloning fresh is the
+cleanest route because it guarantees you're building on exactly what's on
+GitHub.
 
 ---
 
-## Step 0 — set your identity (do this first, it matters)
+## Step 1 — clone your repo fresh
 
-GitHub attributes commits by **email**. If the commit email isn't a verified
-email on your GitHub account, the commits won't link to your profile and won't
-show on your contribution graph. From the repo folder:
+In a Git Bash terminal in VSCode (Terminal -> New Terminal -> dropdown ->
+Git Bash), in a folder where you want the project:
+
+```bash
+git clone https://github.com/esiihle/survey-compact-to-binary.git
+cd survey-compact-to-binary
+```
+
+Then open this folder in VSCode (File -> Open Folder).
+
+Confirm the v0.2.0 history is there:
+
+```bash
+git log --oneline      # should show 7 commits, ending at "docs: release v0.2.0"
+```
+
+If your name/email aren't set globally, set them so the new commits attribute
+to you:
 
 ```bash
 git config user.name  "Sicelwesihle Myeza"
-git config user.email "your-github-verified-email@example.com"   # <-- your real one
+git config user.email "your-github-email@example.com"
 ```
 
----
+## Step 2 — overlay the v0.3.0 files
 
-## Path A — you already have a v0.1.0 commit locally
+Extract `survey-compact-to-binary-v0.3.0.zip`, drill into its inner folder (the
+one that directly contains `src/`), select everything (Ctrl+A), copy (Ctrl+C),
+and paste into your cloned folder, choosing **"Replace the files in the
+destination."** This overwrites the changed files and adds the new ones
+(`nets.py`, `decode.py`, tests, `build_history_v3.sh`, this guide).
 
-1. This zip contains the complete v0.2.0 repo. Copy its contents **over** your
-   existing repo folder, overwriting the older files. (Bring across everything
-   except the folder's `.git` — that stays as yours.)
-2. From the repo root, run the builder:
-   ```bash
-   bash build_history_v2.sh
-   ```
-3. Review, then push:
-   ```bash
-   git log --oneline        # expect 7 commits: v0.1.0 + 6 features
-   git branch -M main
-   git push -u origin main
-   ```
-4. Remove the throwaway helpers so they don't ship:
-   ```bash
-   rm build_history_v2.sh COMMIT_GUIDE.md
-   git add -A && git commit -m "chore: remove local history helper"   # optional
-   ```
+## Step 3 — build the four feature commits
 
----
+```bash
+bash build_history_v3.sh
+```
 
-## Path B — starting fresh (recommended if you haven't pushed yet)
+You should see four commits created and an 11-line history printed.
 
-This is fully deterministic; you need both zips.
+## Step 4 — push (normal, no force)
 
-1. Unzip the **v0.1.0** zip (`survey-compact-to-binary.zip`) and enter it:
-   ```bash
-   unzip survey-compact-to-binary.zip && cd survey-compact-to-binary
-   ```
-2. Initialise and make the baseline commit (set identity per Step 0 first):
-   ```bash
-   git init
-   git config user.name  "Sicelwesihle Myeza"
-   git config user.email "your-github-verified-email@example.com"
-   git add -A
-   git commit -m "feat: initial release v0.1.0"
-   ```
-3. Copy the contents of the **v0.2.0** zip (`survey-compact-to-binary-v0.2.0.zip`)
-   over this folder, overwriting when prompted. Then:
-   ```bash
-   bash build_history_v2.sh
-   ```
-4. Create an empty repo on GitHub (no README/licence), then:
-   ```bash
-   git branch -M main
-   git remote add origin git@github.com:<you>/survey-compact-to-binary.git
-   git push -u origin main
-   ```
-5. Remove the helpers:
-   ```bash
-   rm build_history_v2.sh COMMIT_GUIDE.md
-   ```
+```bash
+git push
+```
+
+## Step 5 — clean up
+
+```bash
+rm build_history_v3.sh COMMIT_GUIDE.md
+```
+
+Refresh GitHub — 11 commits, ending at "docs: release v0.3.0".
 
 ---
 
-## What the history will look like
+## If you'd rather use your existing local clone
+
+Skip Step 1's clone. In your existing repo folder, first make sure it's current
+and clean:
+
+```bash
+git pull
+git status      # should be clean before you start
+```
+
+Then do Steps 2-5 as above.
+
+## What the new history looks like
 
 ```
+docs: release v0.3.0
+feat: decode — inverse binary to compact transform
+feat: Excel (.xlsx) table I/O
+feat: net/combination variables
 docs: release v0.2.0
-feat: logging and CLI surface for the new capabilities
-feat: Parquet and TSV table I/O
-feat: penetration/frequency statistics
-feat: exclusive-code integrity check
-feat: value-labelled indicator columns
+... (the six v0.2.0 commits) ...
 feat: initial release v0.1.0
 ```
 
-Each feature commit includes its own tests, so the suite grows commit by commit
-(14 → 18 → 22 → 26 → 29). The CI workflow runs on every push.
+Each new feature commit ships its own tests, so the suite grows
+29 -> 35 -> 37 -> 40. CI runs on every push.
 
-## Before you make it public — quick checklist
+## Quick checklist
 
-- [ ] `LICENSE`: replace the placeholder name with your full legal name.
-- [ ] Confirm your manager's sign-off covers publishing generalised,
-      synthetic-data versions with no client data or names (applies to every
-      tool in this portfolio).
-- [ ] Sanity check: this repo contains **no** client data — the only data is
-      synthetic, generated by `scripts/generate_synthetic_data.py`.
-- [ ] Optional: run `gitleaks detect` once before the first push.
+- [ ] Commit email is verified on your `esiihle` account (for contribution credit).
+- [ ] `LICENSE` has your full legal name (only matters if you haven't already fixed it).
+- [ ] Manager sign-off still covers this (generalised, synthetic-data only) — unchanged.

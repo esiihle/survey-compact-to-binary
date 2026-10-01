@@ -27,3 +27,4 @@ jobs:
           python scripts/generate_synthetic_data.py --rows 200 --seed 1 --out data/tmp.csv
           compact2binary convert -i data/tmp.csv -c config/codeframe.example.yaml -o data/tmp.parquet --labels --validate
           compact2binary stats -i data/tmp.parquet -c config/codeframe.example.yaml --weight weight --labels
+          compact2binary decode -i data/tmp.parquet -c config/codeframe.example.yaml -o data/tmp_compact.csv --labels

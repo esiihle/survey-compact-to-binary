@@ -42,10 +42,12 @@ it produces binary output like this:
 - **Value-labelled columns.** Name indicators `Q3_krunch` instead of `Q3_4` with `--labels` (or a `{label}` template) for self-documenting output.
 - **Exclusive-code integrity check.** Declare a "None of these" code as exclusive; the validator flags any respondent who picks it *and* a real option.
 - **Penetration stats.** A `stats` command emits per-code frequencies and percentages, weighted when you supply a weight column.
-- **CSV, TSV & Parquet.** Read and write any of them; the format is chosen from the file extension.
+- **Net / combination variables.** Define `nets` in the codeframe (e.g. "Any premium" = codes 4, 7, 8) and get extra OR'd 0/1 columns like `Q3_net_any_premium`.
+- **Round-trippable.** A `decode` command rebuilds compact data from the binary matrix — handy for feeding tools that expect compact input.
+- **CSV, TSV, Parquet & Excel.** Read and write any of them; the format is chosen from the file extension.
 - **Runnable out of the box.** A synthetic data generator means you can clone and run the whole pipeline in under a minute.
 
-See [CHANGELOG.md](CHANGELOG.md) for the full 0.1.0 → 0.2.0 history.
+See [CHANGELOG.md](CHANGELOG.md) for the full 0.1.0 → 0.3.0 history.
 
 ## Quickstart
 
@@ -68,7 +70,7 @@ compact2binary convert \
 Expected tail:
 
 ```
-Wrote 500 rows x 21 cols -> data/synthetic_binary.csv
+Wrote 500 rows x 23 cols -> data/synthetic_binary.csv
 Validation: PASS
   respondents: 500
   multi_questions: 2
@@ -153,17 +155,26 @@ compact2binary convert -i data/dirty.csv -c config/codeframe.example.yaml \
     -o data/dirty_binary.csv --validate   # -> Validation: FAIL, exit 1
 ```
 
+Round-trip the other way — rebuild compact data from a binary matrix:
+
+```bash
+compact2binary decode -i data/synthetic_binary.csv \
+    -c config/codeframe.example.yaml -o data/compact_again.csv
+```
+
 ## Project structure
 
 ```
 survey-compact-to-binary/
 ├── src/compact2binary/
-│   ├── codeframe.py     # Codeframe model + YAML loader (incl. exclusive codes)
+│   ├── codeframe.py     # Codeframe model + YAML loader (exclusive codes, nets)
 │   ├── util.py          # slugify + indicator-name formatting
+│   ├── nets.py          # net / combination variables
 │   ├── stats.py         # penetration / frequency statistics
-│   ├── tables.py        # CSV / TSV / Parquet I/O dispatch
+│   ├── tables.py        # CSV / TSV / Parquet / Excel I/O dispatch
 │   ├── logging_setup.py # --verbose / --quiet logging
 │   ├── convert.py       # compact -> binary conversion
+│   ├── decode.py        # binary -> compact inverse transform
 │   ├── validate.py      # independent QC / audit
 │   └── cli.py           # command-line interface
 ├── scripts/

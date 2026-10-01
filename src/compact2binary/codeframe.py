@@ -43,6 +43,19 @@ class CodeframeError(ValueError):
 
 
 @dataclass
+class Net:
+    """A named OR-combination of a question's codes (a 'net' or 'combo').
+
+    Produces one extra 0/1 indicator column that is 1 when the respondent
+    selected *any* of the member codes — e.g. "Any premium brand" = codes
+    4, 7, 8. Nets are a staple survey deliverable.
+    """
+
+    label: str
+    codes: list[int]
+
+
+@dataclass
 class Question:
     """One survey question described in the codeframe.
 
@@ -71,6 +84,7 @@ class Question:
     delimiter: str = ";"
     missing_policy: str = MISSING_ZERO
     exclusive: list[int] = field(default_factory=list)
+    nets: list[Net] = field(default_factory=list)
 
     @property
     def is_multi(self) -> bool:
@@ -178,6 +192,30 @@ def _parse_question(raw: dict[str, Any], index: int) -> Question:
             )
         exclusive.append(code)
 
+    # Optional nets: named OR-combinations of this question's codes.
+    raw_nets = raw.get("nets", []) or []
+    if not isinstance(raw_nets, list):
+        raise CodeframeError(f"{ctx}: 'nets' must be a list")
+    nets: list[Net] = []
+    for i, rawnet in enumerate(raw_nets):
+        nctx = f"{ctx} net[{i}]"
+        if not isinstance(rawnet, dict):
+            raise CodeframeError(f"{nctx}: each net must be a mapping")
+        nlabel = str(_require(rawnet, "label", nctx))
+        ncodes_raw = _require(rawnet, "codes", nctx)
+        if not isinstance(ncodes_raw, list) or not ncodes_raw:
+            raise CodeframeError(f"{nctx}: 'codes' must be a non-empty list")
+        ncodes: list[int] = []
+        for c in ncodes_raw:
+            try:
+                cc = int(c)
+            except (TypeError, ValueError):
+                raise CodeframeError(f"{nctx}: code '{c}' is not an integer")
+            if cc not in codes:
+                raise CodeframeError(f"{nctx}: code {cc} is not in this question's codes")
+            ncodes.append(cc)
+        nets.append(Net(label=nlabel, codes=ncodes))
+
     if storage == MULTI_COLUMN:
         cols = _require(raw, "columns", ctx)
         if not isinstance(cols, list) or not cols:
@@ -185,7 +223,7 @@ def _parse_question(raw: dict[str, Any], index: int) -> Question:
         return Question(
             qid=qid, label=label, qtype=qtype, codes=codes, storage=storage,
             columns=[str(c) for c in cols], missing_policy=missing_policy,
-            exclusive=exclusive,
+            exclusive=exclusive, nets=nets,
         )
     # delimited
     column = str(_require(raw, "column", ctx))
@@ -193,7 +231,7 @@ def _parse_question(raw: dict[str, Any], index: int) -> Question:
     return Question(
         qid=qid, label=label, qtype=qtype, codes=codes, storage=storage,
         column=column, delimiter=delimiter, missing_policy=missing_policy,
-        exclusive=exclusive,
+        exclusive=exclusive, nets=nets,
     )
 
 

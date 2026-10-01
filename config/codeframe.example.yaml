@@ -42,6 +42,11 @@ questions:
     # Code 9 ("None of these") is exclusive: a respondent who picks it must
     # not also pick a real brand. The validator flags any that do.
     exclusive: [9]
+    # Nets: named OR-combinations emitted as extra 0/1 columns
+    # (Q3_net_any_core_brand, Q3_net_any_premium).
+    nets:
+      - { label: "Any core brand", codes: [1, 2, 3] }
+      - { label: "Any premium",    codes: [4, 7, 8] }
     codes:
       1: "Crispa"
       2: "Muncho"
