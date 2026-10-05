@@ -1,12 +1,12 @@
 # compact2binary
 
-**Convert compact multi-response survey data into a clean binary (0/1) indicator matrix — driven entirely by a codeframe, validated end to end.**
-
+**Convert compact multi-response survey data into a clean binary (0/1) indicator matrix; driven entirely by a codeframe, validated end to end.**
+[![CI](https://github.com/esiihle/survey-compact-to-binary/actions/workflows/ci.yml/badge.svg)](https://github.com/esiihle/survey-compact-to-binary/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![tests](https://img.shields.io/badge/tests-pytest-brightgreen)
 
-Multi-response survey questions ("select all that apply") are commonly stored in a **compact** layout — a few columns holding the *codes* a respondent picked. Most analysis, cross-tabulation, and modelling instead needs a **binary** layout — one 0/1 column per possible answer. Doing that expansion by hand is slow, error-prone, and easy to get subtly wrong (dropped codes, off-by-one mentions, silent unknown values).
+Multi-response survey questions ("select all that apply") are commonly stored in a **compact** layout; a few columns holding the *codes* a respondent picked. Most analysis, cross-tabulation, and modelling instead needs a **binary** layout; one 0/1 column per possible answer. Doing that expansion by hand is slow, error-prone, and easy to get subtly wrong (dropped codes, off-by-one mentions, silent unknown values).
 
 `compact2binary` automates the expansion, keeps everything else in the file untouched, and **QCs its own output** so mistakes surface loudly instead of slipping into a deliverable.
 
@@ -37,7 +37,7 @@ it produces binary output like this:
 - **Codeframe-driven.** Nothing survey-specific is hard-coded. A single YAML file describes every question; the same engine handles any survey.
 - **Two compact storage layouts.** Multi-column ("one column per mention") *and* delimited ("codes joined in one cell").
 - **Passthrough-safe.** IDs, weights, single-response questions, and open-ends are carried through in their original order, untouched.
-- **Built-in QC.** An independent validator re-reads the input and checks the output for unknown codes, unparseable tokens, round-trip count mismatches, and non-binary values — returning a structured report and a non-zero exit code for CI.
+- **Built-in QC.** An independent validator re-reads the input and checks the output for unknown codes, unparseable tokens, round-trip count mismatches, and non-binary values; returning a structured report and a non-zero exit code for CI.
 - **Correct missing-data handling.** Choose per question whether a blank answer means "selected nothing" (`0`) or "not asked / off-base" (`NaN`).
 - **Value-labelled columns.** Name indicators `Q3_krunch` instead of `Q3_4` with `--labels` (or a `{label}` template) for self-documenting output.
 - **Exclusive-code integrity check.** Declare a "None of these" code as exclusive; the validator flags any respondent who picks it *and* a real option.
@@ -137,7 +137,7 @@ Indicator columns are named with the `output_template` (default `"{qid}_{code}"`
 
 ### Validation / QC
 
-The validator is deliberately **independent** of the converter — it re-parses the compact input rather than trusting the conversion, so it can actually catch conversion bugs. It reports:
+The validator is deliberately **independent** of the converter; it re-parses the compact input rather than trusting the conversion, so it can actually catch conversion bugs. It reports:
 
 | Check | Meaning |
 |-------|---------|
