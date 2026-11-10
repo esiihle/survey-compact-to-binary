@@ -1,15 +1,14 @@
 """Compact -> binary conversion.
 
-The single job of this module: expand every multi-response question from its
-*compact* storage (a handful of code-bearing columns) into a *binary* matrix
-with one 0/1 indicator column per answer code. Single-response and other
-columns are carried through untouched.
+This module has one job: expand every multi-response question from its compact
+storage (a handful of code-bearing columns) into a binary matrix with one 0/1
+indicator column per answer code. Single-response and other columns are carried
+through untouched.
 
-Parsing is intentionally forgiving about surface formatting (floats like
-``"3.0"``, stray whitespace, empty cells) but never invents data: a token
-that cannot be read as an integer code is dropped from the conversion and
-surfaced separately by :mod:`compact2binary.validate`, so nothing fails
-silently.
+Parsing is forgiving about surface formatting (floats like ``"3.0"``, stray
+whitespace, empty cells) but it never invents data. A token that can't be read
+as an integer code is dropped from the conversion and reported separately by
+:mod:`compact2binary.validate`, so nothing fails silently.
 """
 
 from __future__ import annotations
@@ -68,7 +67,7 @@ def parse_selected_codes(
     * ``was_blank`` is True when the respondent supplied no tokens at all
       (used to apply the question's missing-data policy).
 
-    Codes are *not* checked against the codeframe here; that audit belongs to
+    Codes are not checked against the codeframe here; that audit belongs to
     the validator. This function only reads what is on the row.
     """
     if question.storage == MULTI_COLUMN:

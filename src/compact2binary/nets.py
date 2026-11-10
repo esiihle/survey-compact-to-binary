@@ -1,15 +1,15 @@
 """Net / combination variables.
 
-A *net* is a named OR-combination of a question's codes, emitted as one extra
+A net is a named OR-combination of a question's codes, emitted as one extra
 0/1 indicator column. Nets are one of the most common survey deliverables:
 "Any premium brand", "Top 3 brands", "Any negative sentiment". Defining them in
 the codeframe keeps the rule in one place and out of downstream spreadsheets.
 
 A net column is:
 
-* ``1`` if the respondent selected **any** member code,
+* ``1`` if the respondent selected any member code,
 * ``0`` if they were on-base but selected none of them,
-* ``NaN`` if every member is NaN (off-base / not asked) — the net inherits the
+* ``NaN`` if every member is NaN (off-base / not asked). The net inherits the
   missing-data policy of its underlying indicators.
 """
 

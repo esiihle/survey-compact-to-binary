@@ -1,7 +1,7 @@
 """Penetration / frequency statistics.
 
 Once data is in binary form, the first thing an analyst usually wants is
-*penetration*: for each answer code, what share of respondents selected it.
+penetration: for each answer code, what share of respondents selected it.
 This module computes that from a binary matrix, weighted when a weight column
 is supplied, and returns a tidy table ready to print or export.
 

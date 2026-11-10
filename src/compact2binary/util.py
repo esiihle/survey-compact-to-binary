@@ -1,7 +1,7 @@
 """Small shared helpers.
 
-Kept separate so both the converter and the validator name indicator columns
-through exactly the same function — if the naming rule ever changes, it changes
+Kept separate so the converter and the validator name indicator columns
+through exactly the same function. If the naming rule ever changes, it changes
 in one place.
 """
 

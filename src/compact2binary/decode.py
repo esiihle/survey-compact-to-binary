@@ -1,20 +1,20 @@
 """Inverse transform: binary matrix -> compact format.
 
-The converter expands compact storage into a 0/1 matrix; ``decode`` goes the
+The converter expands compact storage into a 0/1 matrix. ``decode`` goes the
 other way, collapsing each multi-response question's indicator columns back
-into a single delimited column of selected codes. This is useful for feeding
-other tools that expect compact input, and it makes the pipeline round-trippable
+into a single delimited column of selected codes. That is useful for feeding
+other tools that expect compact input, and it means the pipeline round-trips
 (``decode(convert(x))`` recovers the selected codes).
 
 Notes:
 
-* Output is always *delimited* compact (one column per question), even if the
-  original used multi-column storage — a single canonical compact form.
-* Net columns and indicator columns are consumed; all other columns pass
+* Output is always delimited compact (one column per question), even if the
+  original used multi-column storage. It is one canonical compact form.
+* Net columns and indicator columns are consumed, and all other columns pass
   through untouched.
-* A respondent with no selected codes (or off-base NaN indicators) yields an
-  empty cell — compact storage cannot distinguish "selected none" from
-  "not asked", by nature.
+* A respondent with no selected codes (or off-base NaN indicators) gives an
+  empty cell. Compact storage can't tell "selected none" apart from "not
+  asked".
 """
 
 from __future__ import annotations

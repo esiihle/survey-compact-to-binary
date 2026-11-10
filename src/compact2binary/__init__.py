@@ -1,4 +1,4 @@
-"""compact2binary — convert compact multi-response survey data to a 0/1 matrix.
+"""compact2binary: convert compact multi-response survey data to a 0/1 matrix.
 
 Public API::
 

@@ -1,19 +1,19 @@
 """Validation and QC for the conversion.
 
-The validator is deliberately independent of the converter: it re-reads the
-original compact data and checks the produced binary frame against it and
-against the codeframe. This catches the failure modes that matter in real
-survey processing:
+The validator is kept independent of the converter. It re-reads the original
+compact data and checks the binary frame against both that data and the
+codeframe, so it can actually catch conversion bugs. These are the failure
+modes that matter in real survey processing:
 
-* **Unknown codes** - a code present in the data but absent from the
-  codeframe (usually a stale codeframe or an upstream recode bug).
-* **Unparseable tokens** - cells that are not integer codes.
-* **Round-trip mismatch** - the number of indicators set for a respondent
-  must equal the number of distinct known codes they actually selected.
-* **Domain violations** - every indicator must be 0, 1, or (deliberately) NaN.
+* Unknown codes: a code that is in the data but not in the codeframe (usually
+  a stale codeframe or an upstream recode bug).
+* Unparseable tokens: cells that are not integer codes.
+* Round-trip mismatch: the number of indicators set for a respondent should
+  equal the number of distinct known codes they actually selected.
+* Domain violations: every indicator must be 0, 1, or an intended NaN.
 
-The result is a structured :class:`ValidationReport`; nothing is printed here,
-so the same report can drive a CLI, a test assertion, or a log line.
+The result is a ValidationReport. Nothing is printed here, so the same report
+can drive a CLI, a test assertion, or a log line.
 """
 
 from __future__ import annotations

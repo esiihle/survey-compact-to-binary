@@ -1,20 +1,20 @@
 """Codeframe model and loader.
 
-A *codeframe* is the survey metadata that tells the converter how each
-variable is stored and what its answer codes mean. It is the single source
-of truth for the whole pipeline: nothing about a specific survey is
-hard-coded in the conversion logic — it all lives in a codeframe YAML file.
+A codeframe is the survey metadata that tells the converter how each variable
+is stored and what its answer codes mean. It is the single source of truth for
+the whole pipeline. Nothing about a specific survey is hard-coded in the
+conversion logic; it all lives in a codeframe YAML file.
 
 Two question storage layouts are supported for multi-response questions:
 
-* ``multi_column``  - one column per "mention", each cell holding a single
-  code (e.g. ``Q3_m1=3``, ``Q3_m2=7``). Blank cells mean "no further
+* ``multi_column``: one column per "mention", each cell holding a single code
+  (for example ``Q3_m1=3``, ``Q3_m2=7``). Blank cells mean "no further
   mentions". This is how Q / SPSS often export multi-response grids.
-* ``delimited``     - a single column holding several codes joined by a
-  delimiter (e.g. ``"3;7;12"``).
+* ``delimited``: a single column holding several codes joined by a delimiter
+  (for example ``"3;7;12"``).
 
-Single-response questions and any other columns (IDs, weights, open-ends)
-are passed through untouched.
+Single-response questions and any other columns (IDs, weights, open-ends) are
+passed through untouched.
 """
 
 from __future__ import annotations
@@ -47,7 +47,7 @@ class Net:
     """A named OR-combination of a question's codes (a 'net' or 'combo').
 
     Produces one extra 0/1 indicator column that is 1 when the respondent
-    selected *any* of the member codes — e.g. "Any premium brand" = codes
+    selected any of the member codes, for example "Any premium brand" = codes
     4, 7, 8. Nets are a staple survey deliverable.
     """
 
